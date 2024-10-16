@@ -1,11 +1,44 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
+import ToDoItem from './components/ToDoItem';
+import Input from './components/Input';
 
 export default function App() {
+  const [tasks, setTasks] = useState([]);
+
+  const addTask = (task) => {
+    setTasks([...tasks, {
+      id: Date.now().toString(),
+      text: task,
+      isCompleted: true  // Status default: belum selesai
+    }]);
+
+  };
+
+  const toggleTaskStatus = (id) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
+    ));
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <FlatList
+        data={tasks}
+        renderItem={({ item }) => (
+          <ToDoItem
+            task={item}
+            toggleTaskStatus={toggleTaskStatus}
+            deleteTask={deleteTask}
+          />
+        )}
+        keyExtractor={item => item.id}
+      />
+      <Input addTask={addTask} />
     </View>
   );
 }
@@ -13,8 +46,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
   },
 });
